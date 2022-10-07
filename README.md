@@ -2,6 +2,7 @@
 
 Code for different filters in the test phase to improve label assignment by predicting a CNN.
 
+In this project, several data sets are used from the sources \cite{cruz2017accurate}.
 
 Whole slide image (WSI) and the tumor mask associated with the normal tissue (zone black) and the tumor tissue (zone white). 
 
@@ -28,5 +29,5 @@ One time that the patches are divided, traing different configuration to study t
 TESTING PHASE
 
 Here, once the CNN configuration is selected, and the model training is saved in a .h5 file format (saved in 'CNN_V2_s2_balanceo.py'), the testing phase is performed to evaluate the final configuration. The testing phase is done in first instance in 'Testeo_con_and_sin_overlapping_V6_splits_sin_blancos.py'. 
-In this script are implementd the traditional method that directly use the the model pre-train to evaluate the patches of each images. In addition, different overlapp methods are proposed to improve patch performance. (explained in more detail in the paper ...)
+In this script are implemented the traditional method that directly uses the model pre-train to evaluate the patches of each image. In addition, different overlapping methods are proposed to improve patch performance. (explained in more detail in the paper ...)
 Others script to testing phase is 'testeo_mas_salida_mapas_mas_dif_parches_todos_los_casos.py'
