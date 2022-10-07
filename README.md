@@ -2,7 +2,7 @@
 
 Code for different filters in the test phase to improve label assignment by predicting a CNN.
 
-In this project, several data sets are used from the sources \cite{cruz2017accurate}.
+In this project, several data sets are used from the source https://www.nature.com/articles/srep46450.
 
 Whole slide image (WSI) and the tumor mask associated with the normal tissue (zone black) and the tumor tissue (zone white). 
 
