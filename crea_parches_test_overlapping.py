@@ -1,3 +1,6 @@
+#scrolls 50*100 patches on the mask and labels the area depending on a percentage. 
+#If the mean of the mask is greater than 38 it labels it as a tumour because most of the patch is tumour (38 why is the 0.15% of 255).
+
 
 import cv2 
 import matplotlib 
@@ -12,11 +15,12 @@ path_patch='C:/Users/Sergio/Documents/CANCER/Patch_CINJ_test_overlapping_15_porc
 # path_mask='D:/Sergio/doi_10.5061_dryad.1g2nt41__v1/CINJ_masks_HG/CINJ_masks_HG/'
 # path_patch='D:/Sergio/Patch/Data_6_4/patch_100_100_imagenes_CINJ/'
 
+
 for i in glob.glob(path+'*.png'):
     
     name=str(i)
     f=name.replace('\\','/' )
-    save_name = f.split('/')[-1]   #split()método divide una cadena en una lista
+    save_name = f.split('/')[-1]  
     print(save_name)
     mascara=f.split('/')[-1].split('_')[0] 
     img_bgr=cv2.imread(path+save_name)
@@ -28,7 +32,7 @@ for i in glob.glob(path+'*.png'):
 
         name_mask=str(j)
         f=name_mask.replace('\\','/' )
-        save_name_mask = f.split('/')[-1]   #split()método divide una cadena en una lista
+        save_name_mask = f.split('/')[-1]   
         print(save_name_mask)
         
         img_mask=cv2.imread(path_mask+save_name_mask)
