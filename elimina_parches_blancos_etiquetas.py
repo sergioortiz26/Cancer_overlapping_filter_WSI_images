@@ -7,6 +7,12 @@ Created on Wed Jun  1 16:55:27 2022
 
 import numpy as np
 
+#The images may have patches that are white because they do not have tissue,
+#simply by obtaining the image of the sample there is a part that does not give information about the background. 
+#These patches can be removed to avoid labelling with patches that contain no information.  
+#What is done is to set a threshold and if the mean colour of the patch is lower than that threshold, 
+# (i.e. the area being studied is white, that patch is removed from the data set to train the CNN).
+
 def elimina_parches_blancos_etiquetas(x_cada_parche,etiquetas_pred_binarias,etiquetas_reales):
     
     etiquetas_pred_sin_blancos=[]
