@@ -27,9 +27,9 @@ import matplotlib
 def testeo_patches(x_test,y_test,path_model,limite_pred):
     
     
-    model = keras.models.load_model(path_model)     # cargamos el modelo
+    model = keras.models.load_model(path_model)     # we load the model
             
-    val_preds = model.predict(x_test)               # predecimos las etiquetas de los parches de entrada
+    val_preds = model.predict(x_test)                # we predict the labels of the input patches
 
 
     etiquetas_pred_porcentajes = val_preds[:,1]
