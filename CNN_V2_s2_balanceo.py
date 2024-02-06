@@ -54,21 +54,21 @@ import keras
 width = 100
 height = 100
 # PATHS AND VARIABLES
-splits = 5 # número de segmentos que hemos creado
+splits = 5 # number of segments we have created
 #path_input = '../Patch/inputs/inputs_labels_split_path__distribucion_3400_'
 
-classes = ['tumor', 'normal']
+classes = ['tumor', 'normal'] # name of the classes
 # CNN hyper-parameters
-epochs = 50# número de epochs para el entrenamiento
-lr = 0.001 # valor del learning rate
-batch_size = 512 # valor del batch size
+epochs = 50  # number of epochs for training
+lr = 0.001 # value of initial learning rate
+batch_size = 512 # value of batch size
 output_layer=2
-lr = [0.01,0.001,0.0001] # valor del learning rate
+lr = [0.01,0.001,0.0001] # value of learning rate
 
-Optimizers_name=['SGD','Adam']
+Optimizers_name=['SGD','Adam']   # two optimizers
 Optimizers=[SGD,Adam]
 
-porcentaje_entrenamiento=[0,30,70,50]
+porcentaje_entrenamiento=[0,30,70,50]  # percentage trained layers
 
 tra=['Non_trainable','Trainable','trainable','trainable','trainable']
 
@@ -87,7 +87,7 @@ class LossHistory(keras.callbacks.Callback):
         self.lr.append(step_decay(len(self.losses)))
         print('lr:', step_decay(len(self.losses)))
 
-def step_decay(epoch):
+def step_decay(epoch):   #Decay function of the lr
     initial_lrate = 0.1
     drop = 0.5
     epochs_drop = 10.0
@@ -98,13 +98,14 @@ def step_decay(epoch):
 
 
 #for j in range(np.size(lr)):
-for j in range(2,3):                            # j fix the architecture
+for j in range(2,3):                            # j fix the architecture   (with this evaluate two architectures)
     
-#    for i in range(np.size(Optimizers)):       # i fix the optimizer
+#    for i in range(np.size(Optimizers)):       # i fix the optimizer  (may vary according to needs)
     for i in range(2):
         
       for w in range(1):                        # w fix the percentage of layer that are trained
-          
+
+        #Create the variables
         label_pre_total=[]
         label_tru_total=[]
         label_test_total=[]
@@ -117,7 +118,7 @@ for j in range(2,3):                            # j fix the architecture
         
         print('Con balanceo 1_1_4 pero con data augmentation ')
         
-        for split in range(5):
+        for split in range(5):   #number of split the data
 
             val_acc = []
                   
@@ -127,7 +128,8 @@ for j in range(2,3):                            # j fix the architecture
             # print('Learning rate = '+str(lr[j]))
             print('Optimizers = '+Optimizers_name[i])
             print('The CNN used is:'+str(architecture[j]))
-            
+
+            # The inputs are divided into train and validation
             inputs = np.load('C:/Users/Sergio/Documents/CANCER/balanceo_1_1_4/inputs_train_test_validation/'+'inputs_labels_split_path_train_validation_split_split_'+str(split)+'_100x100.npy',  # loads the .npy file where the patches of the different splits are located.
                             allow_pickle=True).item()
             
@@ -135,6 +137,7 @@ for j in range(2,3):                            # j fix the architecture
               #                allow_pickle=True).item()
             
             print("Finished loading data")
+            #evaluate de value and the label of the train and validation data
             x_train = np.asarray(inputs['x_train'])
             y_train = inputs['y_train']
             x_val = np.asarray(inputs['x_val'])
@@ -142,9 +145,10 @@ for j in range(2,3):                            # j fix the architecture
         
         
             # Label Encoder
-            # Los valores de las etiquetas hay que dejarlos en formato one-hot-encoding
-            # para que se pueda entrenar la red correctamente. Es necesario para el
-            # cálculo de la función de pérdida.
+            # The tag values must be left in one-hot-encoding format so that the network can be trained correctly.
+            # so that the network can be trained correctly. This is necessary for the
+            # calculation of the loss function.
+          
             le = preprocessing.LabelEncoder()
             le.fit(classes)
             y_train = le.transform(list(y_train))
@@ -152,10 +156,11 @@ for j in range(2,3):                            # j fix the architecture
             y_val = le.transform(list(y_val))
         
             # Image normalization
-            # Debido a los cálculos matriciales que se realizan en el entrenamiento de 
-            # la red, que los valores se encuentren en un rango de 0-1 ayuda al mismo.
-            # Como el máximo valor de un pixel es 255, es por ello que dividimos
-            # el valor de cada pixel en cada canal por 255.
+            # Due to the matrix calculations that are performed in the training of the network, it helps to 
+            # Due to the matrix calculations that are performed in the training of the network, it helps if the values are in the range 0-1.
+            # As the maximum value of a pixel is 255, we divide the value of each pixel in each channel by 255.
+            # the value of each pixel in each channel by 255.
+          
             x_train = np.divide(x_train, 255)
             #x_test = np.divide(x_test, 255)
             x_val = np.divide(x_val, 255)
@@ -164,8 +169,9 @@ for j in range(2,3):                            # j fix the architecture
             #y_test = to_categorical(y_test)
             y_val = to_categorical(y_val,num_classes=2)
             
-            
-            datagen = ImageDataGenerator(
+            # to increase the number of samples we made changes to the pictures
+          
+        datagen = ImageDataGenerator(
                 rotation_range=20,
                 horizontal_flip=True,
                 vertical_flip=True,
@@ -175,24 +181,25 @@ for j in range(2,3):                            # j fix the architecture
                 cval=1)# prepare iterator
             
             
-            datagen.fit(x_train)  #Esto calculará las estadísticas requeridas para 
-                                  #realizar las transformaciones en los datos de su imagen
+            datagen.fit(x_train)  #This will compute the statistics required to 
+                                  #perform the transformations on your image data
         
             # Model declaration
-            # Declaramos el modelo que vamos a usar. En este caso será InceptionV3
-            # usando los pesos preenterenados en la el conjunto de datos Imagenet.
-            # Después le añadimos algunas capas que seráán las que usemos entrenaremos
-            # como clasificador con las características que extraen las capas 
-            # convolucionales
+            # We declare the model we are going to use. In this case it will be InceptionV3
+            # using the weights pre-entered in the Imagenet dataset.
+            # Then we add some layers that will be the ones that we will use to train
+            # as a classifier with the features extracted by the layers. 
+            # convolutional
+        
             input_shape = (x_train.shape[1], x_train.shape[2], x_train.shape[3])
             
-            if w==0:
+            if w==0: # we make the base model untrained
                 
                 base_model = architecture[j](weights='imagenet', include_top=False,
                                           input_shape=input_shape)
-                base_model.trainable = False # hacemos que el modelo base no se entrene
-
-            elif w!=0:
+                base_model.trainable = False 
+              
+            elif w!=0: #we train a percentage of the layers of the model
                 
                 base_model = architecture[j](weights='imagenet', include_top=False,
                                           input_shape=input_shape)
@@ -204,9 +211,7 @@ for j in range(2,3):                            # j fix the architecture
                     else:
                         base_model.layers[lay].trainable = True
 
-
-
-
+# we add to the base model a number of necessary layers
             x = base_model.output
             x = Flatten()(x)
             x = Dropout(0.5)(x)
@@ -227,14 +232,14 @@ for j in range(2,3):                            # j fix the architecture
             print('El % de capas que se entrenan :'+str((Train_count/len(model.layers))*100)+' %')
 
             # Optimizer
-            # El optimizador es el encargado del entrenamiento de la red. Usará como
-            # entrada el valor del loss y este determinará hacia dóónde debe mover los
-            # pesos. El valor de learning rate lo que determina es cuánto debe seguir
-            # la dirección del gradiente. Un valor de lr pequeño hará que el 
-            # entrenamiento tarde mucho, debido que variamos poco los pesos. Sin embargo
-            # haráá que no salgamos de un óptimo en el espacio de búsqueda. Con un lr
-            # más grande el entrenamiento será más rápido pero podremos pasarnos de
-            # óptimos locales o globales.
+            # The optimiser is in charge of training the network. It will use as
+            # input the value of the loss and it will determine where it should move the
+            # weights. The learning rate value determines how far it should follow the # direction of the gradient.
+            # the direction of the gradient. A small lr value will make the # training take a long time, because 
+            # training takes too long, because we vary the weights too little. However
+            # will ensure that we do not go out of an optimum in the search space. With a larger lr
+            # training will be faster but we may overshoot local or global optima.
+            # local or global optima.
             
             #optimizer = Optimizers[i](learning_rate=lr[j])
             
@@ -261,28 +266,28 @@ for j in range(2,3):                            # j fix the architecture
                 # optimizer = Adam(learning_rate=lr_schedule)
             
             # Early Stopping
-            # El EAS es una técnica utilizada para prevenir el overfitting en una red.
-            # Con ella se monitoriza el error en validación. Si durante varias epochs
-            # el loss en el entrenamiento sigue bajando pero en el conjunto de 
-            # validación sube, se para el entrenamiento y se vuelve a los pesos de la 
-            # red en el momento en que se empezase a dar este suceso.
+            # EAS is a technique used to prevent overfitting in a network.
+            # It monitors the error in validation. If over several epochs
+            # loss in training keeps going down but in the validation set it goes up, stop the training and return to the 
+            # validation set goes up, the training is stopped and returns to the weights of the 
+            # weights of the network at the time when this event started to occur.
             eas = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=10,
                                 verbose=0,
                                 mode='auto', restore_best_weights=True)
             
             # Model compilation and fitting
-            # Con la funcióón compile definimos el tipo de optimizador, la función
-            # de pérdidad y quéé métrica queremos visualizar durante el entrenamiento.
+            # With the compile function we define the type of optimiser, the loss function and which metrics we want to display during training.
+            # and which metrics we want to visualise during training.
             model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                           metrics=['accuracy'])    
         
         
             
-            # Con la función de fit_generator entrenamos el modelo. Datagen.flow lo que
-            # realiza son las operaciones de data augmentation que hemos descrito
-            # anteriormente. Le pasamos el núúmero de epochs y el conjunto de validación
-            # En callbacks le pasamos la funció de Early Stopping que se ha definido 
-            # anteriormente.
+            # With the fit_generator function we train the model. Datagen.flow performs the data augmentation operations
+            # performs the data augmentation operations we have described
+            # above. We pass it the number of epochs and the validation set.
+            # In callbacks we pass the Early Stopping function that was defined # earlier. 
+            # above.
             history = model.fit_generator(
                                 datagen.flow(x_train, y_train, 
                                               batch_size=batch_size),
@@ -293,9 +298,7 @@ for j in range(2,3):                            # j fix the architecture
                                 callbacks=callbacks_list,
                                 shuffle=True)
           
-            # Una vez que el modelo ya está entrenado podemos predecir el conjunto
-            # de validacióón con los pesos finales para visualizar la matriz de
-            # confusión y visualizar el valor final de accuracy.
+        
             val_preds = model.predict(x_val)
             val_preds = to_categorical(np.argmax(val_preds, axis=1),num_classes=2)
             val_acc.append(accuracy_score(y_val, val_preds))
@@ -308,8 +311,8 @@ for j in range(2,3):                            # j fix the architecture
                                   normalize=False,
                                   title='Val Split' + str(split))
             
-            # Si lo deseamos podemos guardar los pesos de la red en ese split
-            # para un posterior uso.
+            # If desired, we can save the weights of the network in that split
+            # for later use.
             # model.save('nombredemimodelo.h5')
         
             print(classification_report(y_val.argmax(axis=1), val_preds.argmax(axis=1), target_names=classes))
@@ -317,8 +320,9 @@ for j in range(2,3):                            # j fix the architecture
             label_pre_total=np.concatenate((label_pre_total,val_preds.argmax(axis=1)), axis=None)
             label_tru_total=np.concatenate((label_tru_total,y_val.argmax(axis=1)), axis=None)
     
-            
-            if w==0:
+
+            #save de data of model
+            if w==0: 
                 
                 model.save('C:/Users/Sergio/Documents/CANCER/balanceo_1_1_4/modelos/model_'+architecture_name[j]+'_split_'+str(split)+'_'+str(epochs)+'_epochs_256_batchsize_'+Optimizers_name[i]+'_non_trainable_optimiz_100x100_inputs_labels_split_path_0-100x100.h5')
                 newfile = open("C:/Users/Sergio/Documents/CANCER/balanceo_1_1_4/salida_train_validation_test_sin_overlapping/CNN_training_and_testeo_model_"+
@@ -329,7 +333,9 @@ for j in range(2,3):                            # j fix the architecture
                 newfile = open("C:/Users/Sergio/Documents/CANCER/balanceo_1_1_4/salida_train_validation_test_sin_overlapping/CNN_training_and_testeo_model_"+
                                architecture_name[j]+'_'+str(epochs)+'_epochs_256_batchsize_'+Optimizers_name[i]+'_trainable_'+str(porcentaje_entrenamiento[w])+"%_balance_menor.txt", "a+")
 
-            
+
+        # PLOT OF THE RESULT IN SCREEN AND SAVE IN A FILE
+        
             fig = plt.figure()
             epoch_values = list(range(epochs))
             plt.plot(epoch_values, history.history['loss'], label='Pérdida de entrenamiento')
