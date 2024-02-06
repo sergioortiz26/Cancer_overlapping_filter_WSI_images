@@ -7,7 +7,9 @@ Created on Thu Sep 22 17:28:22 2022
 
 import numpy as np
 
-
+#Function that studies whether a patch label is mislabelled because it is isolated between an area totally different from the patch label.
+#It studies all the patches that overlap with it as well as all the patches around it and changes or maintains 
+#its label depending on the neighbouring patches. 
 
 def elimina_parches_aislados(imagen):
     
