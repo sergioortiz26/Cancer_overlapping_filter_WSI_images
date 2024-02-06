@@ -12,7 +12,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 from matplotlib import pyplot
 
-
+# Function to create a ROC Curve
 def curve_auc(label_true,prediction):
     
     auc = roc_auc_score(label_true, prediction[:,1])
