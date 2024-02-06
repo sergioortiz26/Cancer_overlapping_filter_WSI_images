@@ -1,6 +1,6 @@
 #scrolls 50*100 patches on the mask and labels the area depending on a percentage. 
 #If the mean of the mask is greater than 38 it labels it as a tumour because most of the patch is tumour (38 why is the 0.15% of 255).
-
+#It performs an overlapping process as it does not change directly to the next patch but stays in the middle of the previous patch to have that overlapping. 
 
 import cv2 
 import matplotlib 
