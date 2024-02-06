@@ -44,8 +44,9 @@ from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import matthews_corrcoef
 
 
-# ---------------------------------------------------- INICIALIZACION DE VARIABLES
+# ---------------------------------------------------- VARIABLE INITIALISATION
 
+#import the model that we saved previously with the script CNN_V2_s2_balanceo.py
 
 #carpeta_modelo_concreto='DenseNet121_ADAM_trainable_20%'
 carpeta_modelo_concreto='DenseNet121_SGD_trainable_70%'
@@ -78,9 +79,6 @@ path_mascaras='C:/Users/Sergio/Documents/CANCER/HUP_masks/'
 version='_version_70%_V1'
 
 
-#nombre_imagenes_test=['12880','12886','8863','8864','8865','8867']
-
-
 classes = ['tumor', 'normal']
 classes2=['normal','tumor']
 
@@ -89,7 +87,9 @@ limite_pred=70
 splits=5
 
 
-# ---------------------------------------------------- LECTURA DE LOS PARCHES DE LAS IMAGENES DE TEST SIN OVERLAPPING
+# ---------------------------------------------------- READING OF THE PATCHES FROM THE TEST IMAGES WITHOUT OVERLAPPING
+
+#nombre_imagenes_test=['12880','12886','8863','8864','8865','8867']
 
 
 etiquetas_reales_total=[]
@@ -135,18 +135,21 @@ for split in range(splits):
     name_model=name_model.split('.')[0]
 
 
-    Data_sin_overlapping=data_reader('DATA split '+str(split)+' imagenes test sin overlapping')   #me creo un objeto data
+    Data_sin_overlapping=data_reader('DATA split '+str(split)+' imagenes test sin overlapping')   #I create a data object
 
     path_patches_sin_overlapping=path_inputs_patches+'inputs_labels_split_path_test_sin_overlapping_split_'+str(split)+'_100x100.npy'
-    Data_sin_overlapping.save_data(path_patches_sin_overlapping,'test',classes)    # llamo al metodo save data del objeto, para guardar los datos (indicando que es lo que quiero leer, en este caso los datos de 'test')
-    
+    Data_sin_overlapping.save_data(path_patches_sin_overlapping,'test',classes)    # I call the save data method of the object, to save the data (indicating what I want to read, in this case the 'test' data).
+
+    #I get the label and image data. I also have this data associated to the name of the image.
     x_test_sin_overlapping = Data_sin_overlapping.data['test']['x_test']
     y_test_sin_overlapping = Data_sin_overlapping.data['test']['y_test']
     name_image_test=Data_sin_overlapping.data['test']['name_imges_test']
 
-    nombre_imagenes_test=name_image_test    #ver el formato de salida de esta variable y compararlo con el de otro script de tsteo
+    nombre_imagenes_test=name_image_test    #view the output format of this variable and compare it to that of another tsteo script
 
-    # ---------------------------------------------------- LECTURA DE LOS PARCHES DE LAS IMAGENES DE TEST CON OVERLAPPING
+    #    ---------------------------------------------------- READING PATCHES FROM OVERLAPPING TEST IMAGES
+    
+    #(This database has been previously created with the same images as above but with the overlapping process implemented).
     
     Data_con_overlapping=data_reader('data1 14 imagenes sin overlapping')
     
@@ -157,8 +160,8 @@ for split in range(splits):
     y_test_con_overlapping = Data_con_overlapping.data['test']['y_test']
     name_image_test=Data_sin_overlapping.data['test']['name_imges_test']
     
-    
-    #Inicializamos las variables que vamos a utilizar
+    # We want to compare the effect of doing the overlay and applying the filter vs. just testing the images without the overlay.
+    #Initialise the variables that we are going to use
     
     etiquetas_reales_sin_blanco_append=[]
     etiquetas_pred_binarias_append=[]
@@ -179,8 +182,8 @@ for split in range(splits):
 
     
     w=0
-    z=0             # z es el contador de los inicios de las imagenes sin overlapping
-    z1=0            # z1 es el contador de los inicios de las imagenes con overlapping
+    z=0              # z is the counter for the beginnings of the images without overlapping.
+    z1=0            # z1 is the counter of the beginnings of the overlapping images.
     
     
     
@@ -217,10 +220,9 @@ for split in range(splits):
         
             
         
-    ###### -------------------------------------------------------------------------------- IMAGENES SIN OVERLAPPING ------------------------------------------------------------------------------
-    
-            # Selecciono de todos los datos de las imagenes de test, solo los de la imagen en question
-            
+    ###### -------------------------------------------------------------------------------- IMAGENES SIN OVERLAPPING ------------------------------------------------------------------------------    
+            # I select from all test image data, only those of the image in question.
+        
             y_test_sin_overlapping_imagen_seleccionada,x_test_sin_overlapping_imagen_seleccionada,dimensions_image_sin_overlapping=data_of_imagen_in_question(
                                                                                                                                         img_,step_patch=100,position_data=z,y_test=y_test_sin_overlapping,x_test=x_test_sin_overlapping)
             
@@ -228,17 +230,21 @@ for split in range(splits):
             max_x=dimensions_image_sin_overlapping['max_x']
             max_y=dimensions_image_sin_overlapping['max_y']
     
-            # Para esa imagen predigo las etiquetas de cada uno de sus parches
-            
+            # For that image I predict the labels for each of its patches
+
+            # test_patches is the function that loads the model and processes the data on the model to obtain the predictive image labels.
+        
             [etiquetas_reales,etiquetas_pred_binarias,etiquetas_pred_porcentajes,etiquetas_pred_porcentaje_fijado,etiquetas_pred_binarias_porcentaje_fijado]=testeo_patches(
                                                                                                                                         x_test_sin_overlapping_imagen_seleccionada,y_test_sin_overlapping_imagen_seleccionada,path_model,limite_pred)
             
-            
+            #We need to remove the with patches
             etiquetas_pred_binarias_sin_blancos,etiquetas_reales_sin_blancos = elimina_parches_blancos_etiquetas(x_test_sin_overlapping_imagen_seleccionada, etiquetas_pred_binarias, etiquetas_reales)
             etiquetas_pred_binarias_porcentaje_fijado_sin_blancos,etiquetas_reales_sin_blancos = elimina_parches_blancos_etiquetas(x_test_sin_overlapping_imagen_seleccionada, etiquetas_pred_binarias_porcentaje_fijado, etiquetas_reales)
             
             etiquetas_reales_sin_blanco_append.extend(etiquetas_reales_sin_blancos)
-            
+
+            # representation of the results
+
             acc=accuracy_score(etiquetas_reales_sin_blancos, etiquetas_pred_binarias_sin_blancos)
             print('Accuracy salida binaria imagen 100x100 sin overlapping = '+str(acc))
             print('CM CNN imagen '+nombre_imagenes_test[w]+'_idx5.png')
@@ -296,7 +302,8 @@ for split in range(splits):
             img2_=img_[0:(max_y)*100,0:(max_x)*100,:]
             
             
-            #MUY IMPORTANTE- CAMBIAR CUANDO SE UTILICE HUP
+            #MUY IMPORTANTE- CAMBIAR CUANDO SE UTILICE otra base de datos
+
             #img_mask=cv2.imread(path_mascaras+nombre_imagenes_test[w]+'.png')
             img_mask=cv2.imread(path_mascaras+nombre_imagenes_test[w]+'_annotation_mask.png')
 
@@ -360,8 +367,8 @@ for split in range(splits):
     
     
     
-    ###### -------------------------------------------------------------------------------- IMAGENES CON OVERLAPPING ---------------------------------------------------------------------------------------------------- 
-    
+    ###### -------------------------------------------------------------------------------- IMAGES WITH OVERLAPPING ---------------------------------------------------------------------------------------------------- 
+    #repet the process but with images with overlapping
     
             y_test_con_overlapping_imagen_seleccionada,x_test_con_overlapping_imagen_seleccionada,dimensions_image_con_overlapping=data_of_imagen_in_question(
                                                                                                                                         img_,step_patch=50,position_data=z1,y_test=y_test_con_overlapping,x_test=x_test_con_overlapping)
@@ -430,10 +437,11 @@ for split in range(splits):
             plt.show()
             
     
+    #············ APPLY THE FILTERS ·······················
+
+    ####################### FILTERS 3x3 with stride 2 ##########################
     
-    ####################### FILTROS 3x3 con stride 2 ##########################
-    
-    #Filtros sobre las predicciones binarias 50%
+    #Filters on binary predictions 50%.
     
             img4_=np.ones(((max_y2)+2,(max_x2)+2))
             
@@ -472,7 +480,7 @@ for split in range(splits):
                         output2[i][j]=0 
     
     
-    #Filtros sobre las predicciones binarias del % fijado
+    #Filters on binary predictions of % fixed
     
     
             img5_=np.ones(((max_y2)+2,(max_x2)+2))
@@ -527,7 +535,7 @@ for split in range(splits):
             
     
             
-    ####################### FILTROS 2X2 con stride 1 + FILTRO 2x2 con stride 2 ##########################
+    ####################### FILTERS 2X2 with stride 1 + FILTER 2X2 with stride 2 ##########################
             
     # (50%)
     # make the filter 2x2 with stride 1 to calculate the average of each corner of the image
@@ -603,8 +611,8 @@ for split in range(splits):
             # kernel2 = [[[[2/9]],[[1/9]]],
             #           [[[4/9]],[[2/9]]]]
             
-            # output17,output18=filtro_Cov2_size_kernel(image=image,size_kernel=(2,2),stride_x_y=(2,2),kernel=kernel1)    #sobre las predicciones binarias 50%
-            # output19,output20=filtro_Cov2_size_kernel(image=output18,size_kernel=(3,3),stride_x_y=(1,1),kernel=kernel2)   #sobre las predicciones binarias del % fijado    
+            # output17,output18=filtro_Cov2_size_kernel(image=image,size_kernel=(2,2),stride_x_y=(2,2),kernel=kernel1)    #about binary predictions 50%
+            # output19,output20=filtro_Cov2_size_kernel(image=output18,size_kernel=(3,3),stride_x_y=(1,1),kernel=kernel2)  #on binary predictions of % fixed    
             
             
             # image_copia_kernel=np.ones(((max_y2)+2,(max_x2)+2))
@@ -760,21 +768,20 @@ for split in range(splits):
             
     # Color map of cancer 
     
-            #Con esta salida voy a calcular el mapa de la imagen, para ello multiplicaré la pred de cada esquina por 50 y la localizaré en la posición correspondiente. 
-            #utilizo la salido del filtro 2x2,1 por eso multiplico por 50, es como si cada parche lo dividiera en 4 sub_parches de 50x50
+     #With this output I will calculate the map of the image, for this I will multiply the pred of each corner by 50 and I will locate it in the corresponding position. 
+            #I use the 2x2,1 filter output, so I multiply by 50, it's as if each patch was divided in 4 sub_patches of 50x50.
     
             img7_=np.ones(((max_y)*100,(max_x)*100,3))
             x=50
             
-            #puede ser que mañana lo tenga que cambiar porque las imagenes de validacion las tengo ordenadas distintas a las de test en los ejes
-            
-            for i in tqdm(range(max_y2)):    #recorro las dimensiones de 50 en 50 
+            #I might have to change it because the validation images are ordered differently from the test images on the axes.            
+            for i in tqdm(range(max_y2)):    #I cut the dimensions of 50 by 50  
                 for j in range(max_x2):
             
-                    if output6[i][j]<0.5:    # si en cada filtrado de 2x2 del averagepooling me da menor que 0.5 quiere decir que hay más parches sanos que con tumor por lo que pongo la imagen original
+                    if output6[i][j]<0.5:     # if in each 2x2 filtering of the averagepooling I get less than 0.5 it means that there are more healthy patches than with tumour, so I put the original image.
             
                         img7_[i*x:(i+1)*x,j*x:(j+1)*x,:]=img2_[i*x:(i+1)*x,j*x:(j+1)*x,:]
-                    else: # en caso contrario pongo la predicion multiplicada por 255 para que me indique la zona
+                    else: # If not, I put the prediction multiplied by 255 to indicate the zone.
             
                         img7_[i*x:(i+1)*x,j*x:(j+1)*x,0]=[255]
                         img7_[i*x:(i+1)*x,j*x:(j+1)*x,1]=[1-output6[i][j]*255]
@@ -1014,8 +1021,8 @@ for split in range(splits):
             
             label_preds_overlapping_8_append.extend(label_preds_overlapping_8) 
             
-    ################################## Almacenamiento de datos en Txt 
-            
+    ################################## Data storage in Txt 
+
             newfile = open(path_output_test+name_model+version+".txt", "a+")
     
             
