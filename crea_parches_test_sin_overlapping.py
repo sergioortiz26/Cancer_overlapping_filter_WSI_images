@@ -5,9 +5,10 @@ Created on Thu May  5 12:47:43 2022
 @author: sergio
 """
 
-#Script to estract anda save patches
+#Script to extract and  save patches
 
-
+#It performs the same process as create_patches_test_overlapping but without overlapping,
+#it goes through the mask and the image and labels according to the average colour of the mask.
 
 import cv2 
 import matplotlib 
@@ -36,7 +37,7 @@ for i in glob.glob(path+'*.png'):
 
         name_mask=str(j)
         f=name_mask.replace('\\','/' )
-        save_name_mask = f.split('/')[-1]   #split()método divide una cadena en una lista
+        save_name_mask = f.split('/')[-1]   
         print(save_name_mask)
         
         img_mask=cv2.imread(path_mask+save_name_mask)
