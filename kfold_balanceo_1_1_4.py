@@ -4,6 +4,7 @@ Created on Mon May 23 10:10:17 2022
 
 @author: sergio
 """
+#function for splitting data into test and train
 
 import cv2
 import pandas as pd
@@ -30,8 +31,8 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
     """Creating a k fold cressvalidation dataset"""
 
     paths=[]
-    paths= glob.glob(path_imagenes+'/*.png')  # obtengo una lista con los path
-    random.shuffle(paths)    #baraja 'shuffle' los paths
+    paths= glob.glob(path_imagenes+'/*.png')  #  I get a list with the path of the patch images
+    random.shuffle(paths)    # 'shuffle' the paths
 
 # One time that I had shuffled the images, I select 20% to test and the rest (80%) to train and validation
 
@@ -53,7 +54,7 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
     window = int(len(Imagen_id) /splits)
 
 
-    for i in tqdm(range(splits)) :   # de 0 a 4  divido los datos de train en 5 -> 1 para validacion y 4 realmente para train
+    for i in tqdm(range(splits)) :   # from 0 to 4 I divide the train data into 5 -> 1 for validation and 4 actually for train.
 
         start = window*i
         end = window*(i+1)
@@ -129,59 +130,59 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
         print( "Number of samples in test within overlapping: {}".format(len(x_test))) 
     
     
-            #Creamos un diccionario donde tenemos poir un lado un array con los datos de las imagenes y por otro sus etiquetas
+        #We create a dictionary where we have on one side an array with the data of the images and on the other side their labels.
         dict_split = {
             'x_test':np.asarray(x_test) ,
             'y_test':np.asarray(y_test),
             'Name_imagen':np.asarray(Imagenes_test)
             }
     
-            #Guardamos un diccionario con las imagenes x y sus etiquetas de test
+            #We keep a dictionary with the x-images and their test labels.
         np.save(folder_output+'inputs_labels_split_path_test_sin_overlapping_split_'+str(i)+'_'+ str(parameters.height)+ "x" +str(parameters.width)+'.npy',dict_split)
         
         
-        for path in tqdm(patches_test_con_overlapping):    #recorro todos los path de las imagenes de test
+        for path in tqdm(patches_test_con_overlapping):     #recorrect all test image paths
     
-            img_ = cv2.imread(path)                #lee la imagen 
+            img_ = cv2.imread(path)               #readtheimage 
             img_rgb = cv2.cvtColor(img_, cv2.COLOR_BGR2RGB)
     
             x_test2.append(img_rgb)
             
             f=path.replace('\\','/' )
-            save_name = f.split('/')[-1]   #split()método divide una cadena en una lista
+            save_name = f.split('/')[-1]   #split()method splits a string into a list
             etiqueta=save_name.split('.')[3]
             y_test2.append(etiqueta)        
     
         print( "Number of samples in test with overlapping: {}".format(len(x_test2))) 
     
     
-            #Creamos un diccionario donde tenemos poir un lado un array con los datos de las imagenes y por otro sus etiquetas
+            #We create a dictionary where we have on one side an array with the data of the images and on the other side their labels.
         dict_split = {
             'x_test':np.asarray(x_test2) ,
             'y_test':np.asarray(y_test2),
             'Name_imagen':np.asarray(Imagenes_test)
             }
     
-            #Guardamos un diccionario con las imagenes x y sus etiquetas de test
+            #We keep a dictionary with the x-images and their test labels.
         np.save(folder_output+'inputs_labels_split_path_test_con_overlapping_split_'+str(i)+'_'+ str(parameters.height)+ "x" +str(parameters.width)+'.npy',dict_split)
     
     
-        for path in tqdm(patches_val_sin_overlapping3):    #recorro todos los path de las imagenes de test
+        for path in tqdm(patches_val_sin_overlapping3):   #recorrect all test image paths
     
-            img_ = cv2.imread(path)                #lee la imagen 
+            img_ = cv2.imread(path)                #readtheimage 
             img_rgb = cv2.cvtColor(img_, cv2.COLOR_BGR2RGB)
     
             x_val.append(img_rgb)
             
             f=path.replace('\\','/' )
-            save_name = f.split('/')[-1]   #split()método divide una cadena en una lista
+            save_name = f.split('/')[-1]   
             etiqueta=save_name.split('.')[3]
             y_val.append(etiqueta)        
     
         print( "Number of samples in validation: {}".format(len(x_val))) 
         
         
-        for path in tqdm(patches_train_sin_overlapping3):    #recorro todos los path de las imagenes de test
+        for path in tqdm(patches_train_sin_overlapping3):    #recorrect all test image paths
     
             img_ = cv2.imread(path)                #lee la imagen 
             img_rgb = cv2.cvtColor(img_, cv2.COLOR_BGR2RGB)
@@ -189,7 +190,7 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
             x_train.append(img_rgb)
             
             f=path.replace('\\','/' )
-            save_name = f.split('/')[-1]   #split()método divide una cadena en una lista
+            save_name = f.split('/')[-1]   
             etiqueta=save_name.split('.')[3]
             y_train.append(etiqueta)        
     
@@ -197,7 +198,6 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
         
         
     
-            #Creamos un diccionario donde tenemos poir un lado un array con los datos de las imagenes y por otro sus etiquetas
         dict_split = {
             'x_train':np.asarray(x_train) ,
             'y_train':np.asarray(y_train),
@@ -205,10 +205,11 @@ def kfold(path_imagenes,patch_100x100_train_and_validation,path_patches_test_sin
             'y_val':np.asarray(y_val)
         }
     
-            #Guardamos un diccionario con las imagenes x y sus etiquetas de test
-            #np.save('../patches/inputs/inputs_labels_split_patch_' + str(height)+ "x" +str(width) + '.npy',dict_split)
+            #We keep a dictionary with the x-images and their test labels.
+        #np.save('../patches/inputs/inputs_labels_split_patch_' + str(height)+ "x" +str(width) + '.npy',dict_split)
         np.save(folder_output+'inputs_labels_split_path_train_validation_split_split_'+str(i)+'_'+ str(parameters.height)+ "x" +str(parameters.width)+'.npy',dict_split)
 
 
-# dividimos en 5 cogemos 1 para test y 4 para train 
-#los de test los guardamos y los de train los volvemos a dividir en 5, 4 para el train propiamente dichi y 1 para validacion
+# we divide into 5 we take 1 for test and 4 for train 
+        
+# we keep the test ones and the train ones we divide them again in 5, 4 for the train itself and 1 for validation.
