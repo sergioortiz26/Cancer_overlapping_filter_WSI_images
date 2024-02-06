@@ -6,12 +6,12 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pandas as pd
 
 path='D:/Sergio/Patch/Data_6_4/Patch_100x100_test/12880_15_porc/'          #path to an image patch folder           
 
 
-
-import pandas as pd
+#check for each image and its mask which area has and does not have camcer to label it.
 
 Pos_x=[]
 Pos_y=[]
@@ -30,7 +30,7 @@ Pos_x_2=np.zeros
 for i in glob.glob(path+'*.png'):
     
     name=str(i)
-    save_name = name.split('/')[-1]   #split()método divide una cadena en una lista
+    save_name = name.split('/')[-1]   #split()method splits a string into a list
     
     posicion_y=save_name.split('.')[1]
     posicion_x=save_name.split('.')[2]
@@ -61,7 +61,7 @@ for i in tqdm(range(max_y+1)):
         for k in glob.glob(path+'*.png'):
 
             name=str(k)
-            save_name = name.split('/')[-1]   #split()método divide una cadena en una lista
+            save_name = name.split('/')[-1]  
             label=save_name.split('.')[3]
             posicion_y=int(save_name.split('.')[1])
             posicion_x=int(save_name.split('.')[2])
